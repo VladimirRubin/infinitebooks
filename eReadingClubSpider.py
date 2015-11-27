@@ -1,12 +1,15 @@
 from grab.spider import Spider, Task
 from grab import Grab
+from pymongo import MongoClient
 import csv
 
 BASE_URL = 'http://www.e-reading.club'
 
 class eReadingClubSpider(Spider):
     def prepare(self):
-        self.result_file = csv.writer(open('result.csv', 'w'))
+        self.client = MongoClient('mongodb://heroku_qq2rrz3t:fl86443lnj8i5ihchkhkoj7q8g@ds059654.mongolab.com:59654/heroku_qq2rrz3t')
+        self.db = self.client['heroku_qq2rrz3t']
+        self.collection = self.db.books
 
     def task_generator(self):
         g = Grab()
@@ -36,11 +39,11 @@ class eReadingClubSpider(Spider):
                 yield Task('book', grab=grab, letter=task.letter, author_id=task.author_id, book_id=book_id)
 
     def task_book(self, grab, task):
-        self.result_file.writerow([
-            task.letter.encode('utf-8'),
-            task.author_id.encode('utf-8'),
-            task.book_id.encode('utf-8')
-        ])
+        self.collection.insert({
+            'letter': task.letter,
+            'author_id': task.author_id,
+            'book_id': task.book_id
+        })
             
 
 
