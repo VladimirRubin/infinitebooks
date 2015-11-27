@@ -1,1 +1,1 @@
-web: python eReadingClubSpider.py
+worker: python eReadingClubSpider.py
